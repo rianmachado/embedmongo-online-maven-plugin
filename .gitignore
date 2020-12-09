@@ -1,0 +1,29 @@
+# Package files #
+*.jar
+*.war
+*.ear
+
+# Eclipse files #
+.classpath
+.project
+.settings
+.factorypath
+.DS_Store
+
+# IntelliJ Idea files #
+*.iml
+.idea/
+
+# Maven derived files
+target
+*.class
+
+# git derived files
+*.orig
+
+# Misc
+*.log
+
+# IntelliJ
+.idea/
+*.iml

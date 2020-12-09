@@ -1,0 +1,11 @@
+{
+	"_id": "58edb75d435b6ecf52c6bf75",
+	"livro": "Harry Potter e as Relíquias da Morte",
+	"lancamento": "2017-07-21",
+	"paginas": 561,
+	"publicado": true,
+	"genero": [
+		"ficcao",
+		"fantasia"
+	]
+}

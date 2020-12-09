@@ -1,0 +1,20 @@
+Commons Compress
+
+https://owasp.org/www-project-top-ten/
+https://commons.apache.org/proper/commons-compress/security-reports.html
+
+______________________________________________________________________________________________________________________________________________________
+
+codehaus-plexus
+https://codehaus-plexus.github.io/
+
+:1: Filename: plexus-utils-3.0.22.jar | Reference: Directory traversal in org.codehaus.plexus.util.Expand | CVSS Score: 0.0 | > org.codehaus.plexus.util.Expand does not guard against directory traversal, but such protection is generally expected from unarchiving tools. > > -- [github.com](https://github.com/codehaus-plexus/plexus-utils/issues/4)See Rule
+
+    O que é travessia de diretório?
+    A travessia de diretório (também conhecida como travessia de caminho de arquivo) é uma vulnerabilidade de segurança da Web que permite que um invasor leia arquivos arbitrários no servidor que está executando um aplicativo. Isso pode incluir código e dados do aplicativo, credenciais para sistemas back-end e arquivos confidenciais do sistema operacional. Em alguns casos, um invasor pode ser capaz de gravar em arquivos arbitrários no servidor, permitindo que eles modifiquem os dados ou o comportamento do aplicativo e, por fim, assumam o controle total do servidor.
+    REF- https://portswigger.net/web-security/file-path-traversal
+
+:2: Filename: plexus-utils-3.0.22.jar | Reference: Possible XML Injection | CVSS Score: 0.0 | > `org.codehaus.plexus.util.xml.XmlWriterUtil#writeComment(XMLWriter, String, int, int, int)` does not check if the comment includes a `"-->"` sequence. This means that text contained in the command string could be interpreted as XML, possibly leading to XML injection issues, depending on how this method is being called. > > -- [github.com](https://github.com/codehaus-plexus/plexus-utils/issues/3)See Rule
+
+
+______________________________________________________________________________________________________________________________________________________
