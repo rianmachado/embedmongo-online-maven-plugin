@@ -31,7 +31,6 @@ import de.flapdoodle.embed.mongo.MongodProcess;
 @Mojo(name="stop", defaultPhase = LifecyclePhase.POST_INTEGRATION_TEST)
 public class StopMojo extends AbstractEmbeddedMongoMojo {
 
-    @SuppressWarnings("deprecation")
 	@Override
     public void executeStart() throws MojoExecutionException, MojoFailureException {
         MongodProcess mongod = (MongodProcess) getPluginContext().get(StartMojo.MONGOD_CONTEXT_PROPERTY_NAME);
