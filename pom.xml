@@ -97,6 +97,7 @@
 				<version>3.5.1</version>
 				<executions>
 					<execution>
+					 	<?m2e ignore?>
 						<id>default-descriptor</id>
 						<phase>process-classes</phase>
 					</execution>
