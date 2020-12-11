@@ -31,8 +31,8 @@ This plugin lets you start and stop an instance of MongoDB during a Maven build,
 							<databaseDirectory>/tmp/mongotest</databaseDirectory>
 							<logging>console</logging>
 							<bindIp>127.0.0.1</bindIp>
-              <!-- Overrride default url download http://fastdl/mongodb.org/-->
-              <downloadPath>https://rianvasconcelos.s3.amazonaws.com/</downloadPath>
+              						<!-- Overrride default url download http://fastdl/mongodb.org/-->
+              						<downloadPath>https://rianvasconcelos.s3.amazonaws.com/</downloadPath>
 							<skip>false</skip>
 							<!-- optional, skips this plugin entirely, use on the command line 
 								like -Dmongodb.skip -->
