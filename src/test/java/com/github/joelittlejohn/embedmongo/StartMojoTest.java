@@ -21,17 +21,22 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Settings;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.yaml.snakeyaml.Yaml;
 
+import com.github.joelittlejohn.embedmongo.configuration.GlobalConfiguration;
 import com.github.joelittlejohn.embedmongo.log.Loggers;
+import com.github.joelittlejohn.embedmongo.mocks.Mock;
 
 /**
  * @author rianmachado@gmail.com
@@ -39,30 +44,36 @@ import com.github.joelittlejohn.embedmongo.log.Loggers;
 @RunWith(MockitoJUnitRunner.class)
 public class StartMojoTest {
 
+	private static String downloadPath;
+
+	private static String version;
+
+	@BeforeClass
+	public static void init() {
+		Yaml yaml = new Yaml();
+		InputStream inputStream = GlobalConfiguration.class.getClassLoader()
+				.getResourceAsStream("applicationTest.yaml");
+		Map<String, Object> objPropertie = yaml.load(inputStream);
+
+		downloadPath = objPropertie.get("downloadpath-binary").toString();
+		version = objPropertie.get("version-binary").toString();
+
+		try {
+			inputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	@Test
 	public void testExecuteStartStop() {
 
-		int port = 0;
-		try {
-			port = NetworkUtils.allocateRandomPort();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		StartMojo startMojo = new StartMojo();
-		startMojo.setProject(new MavenProject());
-		startMojo.setDownloadPath("http://fastdl.mongodb.org/");
-		startMojo.setSettings(new Settings());
-		startMojo.setPort(port);
-		startMojo.setVersion("2.7.1");
-		startMojo.setPluginContext(new HashMap<>());
+		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
 		startMojo.setLogging(Loggers.LoggingStyle.CONSOLE.name());
 		startMojo.onSkip();
+		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
 
-		StopMojo stopMojo = new StopMojo();
-		stopMojo.setProject(new MavenProject());
-		stopMojo.setPort(port);
-		stopMojo.setVersion("2.7.1");
-		stopMojo.setPluginContext(startMojo.getPluginContext());
 		try {
 			startMojo.executeStart();
 			stopMojo.execute();
@@ -76,20 +87,12 @@ public class StartMojoTest {
 	@Test
 	public void testExecuteStartStopRandomPortTrue() {
 
-		StartMojo startMojo = new StartMojo();
-		startMojo.setProject(new MavenProject());
-		startMojo.setDownloadPath("http://fastdl.mongodb.org/");
-		startMojo.setSettings(new Settings());
-		startMojo.setVersion("2.7.1");
-		startMojo.setPluginContext(new HashMap<>());
+		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
 		startMojo.setLogging(Loggers.LoggingStyle.CONSOLE.name());
 		startMojo.onSkip();
 		startMojo.setRandomPort(true);
 
-		StopMojo stopMojo = new StopMojo();
-		stopMojo.setProject(new MavenProject());
-		stopMojo.setVersion("2.7.1");
-		stopMojo.setPluginContext(startMojo.getPluginContext());
+		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
 		try {
 			startMojo.executeStart();
 			stopMojo.execute();
@@ -102,14 +105,10 @@ public class StartMojoTest {
 
 	@Test
 	public void testExecuteStartStopErro() {
-		StartMojo startMojo = new StartMojo();
-		startMojo.setPluginContext(new HashMap<>());
+		StartMojo startMojo = Mock.getStartMojoErro(downloadPath, version);
 		startMojo.setLogging(Loggers.LoggingStyle.FILE.name());
+		StopMojo stopMojo = Mock.getStopMojoErro(startMojo, version);
 
-		StopMojo stopMojo = new StopMojo();
-		stopMojo.setProject(new MavenProject());
-		stopMojo.setPort(27017);
-		stopMojo.setVersion("2.7.1");
 		HashMap<String, String> map = new HashMap<>();
 		map.put(StartMojo.MONGOD_CONTEXT_PROPERTY_NAME, "");
 		stopMojo.setPluginContext(startMojo.getPluginContext());
@@ -127,23 +126,16 @@ public class StartMojoTest {
 
 	@Test
 	public void testExecuteStartStopPortNotEmpty() {
-
-		StartMojo startMojo = new StartMojo();
+		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
+		startMojo.setLogging(Loggers.LoggingStyle.CONSOLE.name());
+		startMojo.onSkip();
 		MavenProject mavenProject = new MavenProject();
 		mavenProject.getProperties().put("embedmongo.port", "25118");
 		startMojo.setProject(mavenProject);
-		startMojo.setDownloadPath("http://fastdl.mongodb.org/");
-		startMojo.setSettings(new Settings());
-		startMojo.setVersion("2.7.1");
-		startMojo.setPluginContext(new HashMap<>());
-		startMojo.setLogging(Loggers.LoggingStyle.CONSOLE.name());
-		startMojo.onSkip();
 
-		StopMojo stopMojo = new StopMojo();
-		stopMojo.setProject(new MavenProject());
+		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
 		stopMojo.setPort(25118);
-		stopMojo.setVersion("2.7.1");
-		stopMojo.setPluginContext(startMojo.getPluginContext());
+
 		try {
 			startMojo.executeStart();
 			stopMojo.execute();
@@ -164,24 +156,16 @@ public class StartMojoTest {
 			e1.printStackTrace();
 		}
 
-		StartMojo startMojo = new StartMojo();
-		MavenProject mavenProject = new MavenProject();
+		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
 		startMojo.setLogFile("embedmongo.log");
 		startMojo.setLogFileEncoding("utf-8");
-		startMojo.setProject(mavenProject);
-		startMojo.setDownloadPath("http://fastdl.mongodb.org/");
-		startMojo.setSettings(new Settings());
-		startMojo.setPort(port);
-		startMojo.setVersion("2.7.1");
-		startMojo.setPluginContext(new HashMap<>());
 		startMojo.setLogging(Loggers.LoggingStyle.FILE.name());
 		startMojo.onSkip();
+		startMojo.setPort(port);
 
-		StopMojo stopMojo = new StopMojo();
-		stopMojo.setProject(mavenProject);
+		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
 		stopMojo.setPort(port);
-		stopMojo.setVersion("2.7.1");
-		stopMojo.setPluginContext(startMojo.getPluginContext());
+
 		try {
 			startMojo.executeStart();
 			stopMojo.execute();

@@ -21,21 +21,28 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.InputStream;
+import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Settings;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.yaml.snakeyaml.Yaml;
+
+import com.github.joelittlejohn.embedmongo.configuration.GlobalConfiguration;
+import com.github.joelittlejohn.embedmongo.mocks.Mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MongoImportMojoTest {
 
 	private static String pathMockJsonFile;
+
+	private static String downloadPath;
+
+	private static String version;
 
 	@BeforeClass
 	public static void init() {
@@ -44,35 +51,29 @@ public class MongoImportMojoTest {
 		if (osName.startsWith("Windows", 0)) {
 			pathMockJsonFile = pathMockJsonFile.substring(1);
 		}
+
+		Yaml yaml = new Yaml();
+		InputStream inputStream = GlobalConfiguration.class.getClassLoader()
+				.getResourceAsStream("applicationTest.yaml");
+		Map<String, Object> objPropertie = yaml.load(inputStream);
+
+		downloadPath = objPropertie.get("downloadpath-binary").toString();
+		version = objPropertie.get("version-binary").toString();
+
+		try {
+			inputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@Test
 	public void testExecuteImportMojoDataBase() {
-
-		StartMojo startMojo = new StartMojo();
-		startMojo.setProject(new MavenProject());
-		startMojo.setDownloadPath("http://fastdl.mongodb.org/");
-		startMojo.setSettings(new Settings());
-		startMojo.setPort(27017);
-		startMojo.setVersion("2.7.1");
-		startMojo.setPluginContext(new HashMap<>());
-
-		MongoImportMojo mongoImportMojo = new MongoImportMojo();
-		ImportDataConfig config = new ImportDataConfig("demo", "collection-demo", pathMockJsonFile, false, false, 1000);
-		ImportDataConfig[] configs = new ImportDataConfig[1];
-		configs[0] = config;
-		mongoImportMojo.setVersion("2.7.1");
-		mongoImportMojo.setPort(27017);
-		mongoImportMojo.setProject(new MavenProject());
-		mongoImportMojo.setImports(configs);
-		mongoImportMojo.setParallel(false);
-
-		StopMojo stopMojo = new StopMojo();
-		stopMojo.setProject(new MavenProject());
-		stopMojo.setPort(27017);
-		stopMojo.setVersion("2.7.1");
-		stopMojo.setPluginContext(startMojo.getPluginContext());
-
+		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
+		MongoImportMojo mongoImportMojo = Mock.getMongoImportMojo(pathMockJsonFile, "collection-demo", false, "demo",
+				version);
+		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
 		try {
 			startMojo.executeStart();
 			mongoImportMojo.execute();
@@ -86,30 +87,8 @@ public class MongoImportMojoTest {
 	@Test
 	public void testExecuteImportMojoDataBaseNotStarted() {
 
-		int port = 0;
-		try {
-			port = NetworkUtils.allocateRandomPort();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-		StartMojo startMojo = new StartMojo();
-		startMojo.setProject(new MavenProject());
-		startMojo.setDownloadPath("http://fastdl.mongodb.org/");
-		startMojo.setSettings(new Settings());
-		startMojo.setPort(port);
-		startMojo.setVersion("2.7.1");
-		startMojo.setPluginContext(new HashMap<>());
-
-		MongoImportMojo mongoImportMojo = new MongoImportMojo();
-		ImportDataConfig config = new ImportDataConfig("demo", "", pathMockJsonFile, false, false, 800);
-		ImportDataConfig[] configs = new ImportDataConfig[1];
-		configs[0] = config;
-		mongoImportMojo.setVersion("2.7.1");
-		mongoImportMojo.setPort(27017);
-		mongoImportMojo.setProject(new MavenProject());
-		mongoImportMojo.setImports(configs);
-		mongoImportMojo.setParallel(true);
+		Mock.getStartMojo(downloadPath, version);
+		MongoImportMojo mongoImportMojo = Mock.getMongoImportMojo(pathMockJsonFile, "", true, "demo", version);
 		try {
 			mongoImportMojo.execute();
 		} catch (MojoExecutionException | MojoFailureException e) {
@@ -120,31 +99,8 @@ public class MongoImportMojoTest {
 
 	@Test
 	public void testExecuteImportMojoDataBaseRequired() {
-
-		int port = 0;
-		try {
-			port = NetworkUtils.allocateRandomPort();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-		StartMojo startMojo = new StartMojo();
-		startMojo.setProject(new MavenProject());
-		startMojo.setDownloadPath("http://fastdl.mongodb.org/");
-		startMojo.setSettings(new Settings());
-		startMojo.setPort(port);
-		startMojo.setVersion("2.7.1");
-		startMojo.setPluginContext(new HashMap<>());
-
-		MongoImportMojo mongoImportMojo = new MongoImportMojo();
-		ImportDataConfig config = new ImportDataConfig("", "", pathMockJsonFile, false, false, 800);
-		ImportDataConfig[] configs = new ImportDataConfig[1];
-		configs[0] = config;
-		mongoImportMojo.setVersion("2.7.1");
-		mongoImportMojo.setPort(27017);
-		mongoImportMojo.setProject(new MavenProject());
-		mongoImportMojo.setImports(configs);
-		mongoImportMojo.setParallel(true);
+		Mock.getStartMojo(downloadPath, version);
+		MongoImportMojo mongoImportMojo = Mock.getMongoImportMojo(pathMockJsonFile, "", true, "", version);
 		try {
 			mongoImportMojo.execute();
 		} catch (MojoExecutionException | MojoFailureException e) {
@@ -154,27 +110,8 @@ public class MongoImportMojoTest {
 
 	@Test
 	public void testExecuteImportMojoDataBaseNotStartedConfigEmpty() {
-
-		int port = 0;
-		try {
-			port = NetworkUtils.allocateRandomPort();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-		StartMojo startMojo = new StartMojo();
-		startMojo.setProject(new MavenProject());
-		startMojo.setDownloadPath("http://fastdl.mongodb.org/");
-		startMojo.setSettings(new Settings());
-		startMojo.setPort(port);
-		startMojo.setVersion("2.7.1");
-		startMojo.setPluginContext(new HashMap<>());
-
-		MongoImportMojo mongoImportMojo = new MongoImportMojo();
-		mongoImportMojo.setVersion("2.7.1");
-		mongoImportMojo.setPort(27017);
-		mongoImportMojo.setProject(new MavenProject());
-		mongoImportMojo.setParallel(true);
+		Mock.getStartMojo(downloadPath, version);
+		MongoImportMojo mongoImportMojo = Mock.getMongoImportMojoEmptyConfiguration(true, version);
 		try {
 			mongoImportMojo.execute();
 			assertNull(mongoImportMojo.getMongoImportProcess());
@@ -186,29 +123,10 @@ public class MongoImportMojoTest {
 	@Test
 	public void testExecuteImportMojoDataBaseParallelTrue() {
 
-		StartMojo startMojo = new StartMojo();
-		startMojo.setProject(new MavenProject());
-		startMojo.setDownloadPath("http://fastdl.mongodb.org/");
-		startMojo.setSettings(new Settings());
-		startMojo.setPort(27017);
-		startMojo.setVersion("2.7.1");
-		startMojo.setPluginContext(new HashMap<>());
-
-		MongoImportMojo mongoImportMojo = new MongoImportMojo();
-		ImportDataConfig config = new ImportDataConfig("demo", "collection-demo", pathMockJsonFile, false, false, 1000);
-		ImportDataConfig[] configs = new ImportDataConfig[1];
-		configs[0] = config;
-		mongoImportMojo.setVersion("2.7.1");
-		mongoImportMojo.setPort(27017);
-		mongoImportMojo.setProject(new MavenProject());
-		mongoImportMojo.setImports(configs);
-		mongoImportMojo.setParallel(true);
-
-		StopMojo stopMojo = new StopMojo();
-		stopMojo.setProject(new MavenProject());
-		stopMojo.setPort(27017);
-		stopMojo.setVersion("2.7.1");
-		stopMojo.setPluginContext(startMojo.getPluginContext());
+		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
+		MongoImportMojo mongoImportMojo = Mock.getMongoImportMojo(pathMockJsonFile, "collection-demo", false, "demo",
+				version);
+		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
 
 		try {
 			startMojo.executeStart();
