@@ -15,10 +15,10 @@
  */
 package com.github.joelittlejohn.embedmongo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,16 +26,19 @@ import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.yaml.snakeyaml.Yaml;
 
-import com.github.joelittlejohn.embedmongo.configuration.GlobalConfiguration;
 import com.github.joelittlejohn.embedmongo.mocks.Mock;
 
-@RunWith(MockitoJUnitRunner.class)
+
+@ExtendWith(MockitoExtension.class)
+@RunWith(JUnitPlatform.class)
 public class MongoImportMojoTest {
 
 	private static String pathMockJsonFile;
@@ -44,7 +47,7 @@ public class MongoImportMojoTest {
 
 	private static String version;
 
-	@BeforeClass
+	@BeforeAll
 	public static void init() {
 		pathMockJsonFile = MongoImportMojoTest.class.getClassLoader().getResource("demo-test.json").getPath();
 		String osName = System.getProperty("os.name");
@@ -53,7 +56,7 @@ public class MongoImportMojoTest {
 		}
 
 		Yaml yaml = new Yaml();
-		InputStream inputStream = GlobalConfiguration.class.getClassLoader()
+		InputStream inputStream = MongoImportMojoTest.class.getClassLoader()
 				.getResourceAsStream("applicationTest.yaml");
 		Map<String, Object> objPropertie = yaml.load(inputStream);
 
