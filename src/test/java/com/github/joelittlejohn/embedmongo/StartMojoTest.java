@@ -15,8 +15,6 @@
  */
 package com.github.joelittlejohn.embedmongo;
 
-
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -54,8 +52,7 @@ public class StartMojoTest {
 	@BeforeAll
 	public static void init() {
 		Yaml yaml = new Yaml();
-		InputStream inputStream = StartMojoTest.class.getClassLoader()
-				.getResourceAsStream("applicationTest.yaml");
+		InputStream inputStream = StartMojoTest.class.getClassLoader().getResourceAsStream("applicationTest.yaml");
 		Map<String, Object> objPropertie = yaml.load(inputStream);
 
 		downloadPath = objPropertie.get("downloadpath-binary").toString();
@@ -70,40 +67,27 @@ public class StartMojoTest {
 	}
 
 	@Test
-	public void testExecuteStartStop() {
-
+	public void testExecuteStartStop() throws MojoExecutionException, MojoFailureException {
 		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
 		startMojo.setLogging(Loggers.LoggingStyle.CONSOLE.name());
 		startMojo.onSkip();
 		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
-
-		try {
-			startMojo.executeStart();
-			stopMojo.execute();
-			assertNotNull(startMojo.getPluginContext().get(StartMojo.MONGOD_CONTEXT_PROPERTY_NAME));
-		} catch (MojoExecutionException | MojoFailureException e) {
-			e.printStackTrace();
-		}
+		startMojo.executeStart();
+		stopMojo.execute();
+		assertNotNull(startMojo.getPluginContext().get(StartMojo.MONGOD_CONTEXT_PROPERTY_NAME));
 
 	}
 
 	@Test
-	public void testExecuteStartStopRandomPortTrue() {
-
+	public void testExecuteStartStopRandomPortTrue() throws MojoExecutionException, MojoFailureException {
 		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
 		startMojo.setLogging(Loggers.LoggingStyle.CONSOLE.name());
 		startMojo.onSkip();
 		startMojo.setRandomPort(true);
-
 		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
-		try {
-			startMojo.executeStart();
-			stopMojo.execute();
-			assertNotNull(startMojo.getPluginContext().get(StartMojo.MONGOD_CONTEXT_PROPERTY_NAME));
-		} catch (MojoExecutionException | MojoFailureException e) {
-			e.printStackTrace();
-		}
-
+		startMojo.executeStart();
+		stopMojo.execute();
+		assertNotNull(startMojo.getPluginContext().get(StartMojo.MONGOD_CONTEXT_PROPERTY_NAME));
 	}
 
 	@Test
@@ -128,7 +112,7 @@ public class StartMojoTest {
 	}
 
 	@Test
-	public void testExecuteStartStopPortNotEmpty() {
+	public void testExecuteStartStopPortNotEmpty() throws MojoExecutionException, MojoFailureException {
 		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
 		startMojo.setLogging(Loggers.LoggingStyle.CONSOLE.name());
 		startMojo.onSkip();
@@ -138,44 +122,27 @@ public class StartMojoTest {
 
 		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
 		stopMojo.setPort(25118);
-
-		try {
-			startMojo.executeStart();
-			stopMojo.execute();
-			assertEquals(25118, startMojo.getPort().intValue());
-		} catch (MojoExecutionException | MojoFailureException e) {
-			e.printStackTrace();
-		}
+		startMojo.executeStart();
+		stopMojo.execute();
+		assertEquals(25118, startMojo.getPort().intValue());
 
 	}
 
 	@Test
-	public void testExecuteStartStopLogFile() {
+	public void testExecuteStartStopLogFile() throws IOException, MojoExecutionException, MojoFailureException {
 
-		int port = 0;
-		try {
-			port = NetworkUtils.allocateRandomPort();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
+		int port = NetworkUtils.allocateRandomPort();
 		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
 		startMojo.setLogFile("embedmongo.log");
 		startMojo.setLogFileEncoding("utf-8");
 		startMojo.setLogging(Loggers.LoggingStyle.FILE.name());
 		startMojo.onSkip();
 		startMojo.setPort(port);
-
 		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
 		stopMojo.setPort(port);
-
-		try {
-			startMojo.executeStart();
-			stopMojo.execute();
-			assertNotNull(startMojo.getPluginContext().get(StartMojo.MONGOD_CONTEXT_PROPERTY_NAME));
-		} catch (MojoExecutionException | MojoFailureException e) {
-			e.printStackTrace();
-		}
+		startMojo.executeStart();
+		stopMojo.execute();
+		assertNotNull(startMojo.getPluginContext().get(StartMojo.MONGOD_CONTEXT_PROPERTY_NAME));
 
 	}
 

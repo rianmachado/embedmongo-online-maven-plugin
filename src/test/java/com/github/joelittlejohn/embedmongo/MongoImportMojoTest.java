@@ -36,7 +36,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.github.joelittlejohn.embedmongo.mocks.Mock;
 
-
 @ExtendWith(MockitoExtension.class)
 @RunWith(JUnitPlatform.class)
 public class MongoImportMojoTest {
@@ -72,19 +71,16 @@ public class MongoImportMojoTest {
 	}
 
 	@Test
-	public void testExecuteImportMojoDataBase() {
+	public void testExecuteImportMojoDataBase() throws MojoExecutionException, MojoFailureException {
 		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
 		MongoImportMojo mongoImportMojo = Mock.getMongoImportMojo(pathMockJsonFile, "collection-demo", false, "demo",
 				version);
 		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
-		try {
-			startMojo.executeStart();
-			mongoImportMojo.execute();
-			stopMojo.execute();
-			assertNotNull(mongoImportMojo.getLog());
-		} catch (MojoExecutionException | MojoFailureException e) {
-			e.printStackTrace();
-		}
+		startMojo.executeStart();
+		mongoImportMojo.execute();
+		stopMojo.execute();
+		assertNotNull(mongoImportMojo.getLog());
+
 	}
 
 	@Test
@@ -112,33 +108,26 @@ public class MongoImportMojoTest {
 	}
 
 	@Test
-	public void testExecuteImportMojoDataBaseNotStartedConfigEmpty() {
+	public void testExecuteImportMojoDataBaseNotStartedConfigEmpty()
+			throws MojoExecutionException, MojoFailureException {
 		Mock.getStartMojo(downloadPath, version);
 		MongoImportMojo mongoImportMojo = Mock.getMongoImportMojoEmptyConfiguration(true, version);
-		try {
-			mongoImportMojo.execute();
-			assertNull(mongoImportMojo.getMongoImportProcess());
-		} catch (MojoExecutionException | MojoFailureException e) {
-			e.printStackTrace();
-		}
+		mongoImportMojo.execute();
+		assertNull(mongoImportMojo.getMongoImportProcess());
 	}
 
 	@Test
-	public void testExecuteImportMojoDataBaseParallelTrue() {
+	public void testExecuteImportMojoDataBaseParallelTrue() throws MojoExecutionException, MojoFailureException {
 
 		StartMojo startMojo = Mock.getStartMojo(downloadPath, version);
 		MongoImportMojo mongoImportMojo = Mock.getMongoImportMojo(pathMockJsonFile, "collection-demo", false, "demo",
 				version);
 		StopMojo stopMojo = Mock.getStopMojo(startMojo, version);
+		startMojo.executeStart();
+		mongoImportMojo.execute();
+		stopMojo.execute();
+		assertNotNull(mongoImportMojo.getLog());
 
-		try {
-			startMojo.executeStart();
-			mongoImportMojo.execute();
-			stopMojo.execute();
-			assertNotNull(mongoImportMojo.getLog());
-		} catch (MojoExecutionException | MojoFailureException e) {
-			e.printStackTrace();
-		}
 	}
 
 }
