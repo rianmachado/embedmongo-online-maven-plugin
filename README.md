@@ -16,7 +16,7 @@ This plugin lets you start and stop an instance of MongoDB during a Maven build,
 		<plugins>
 			<plugin>
 				<groupId>com.github.joelittlejohn.embedmongo</groupId>
-				<artifactId>embedmongo-offline-maven-plugin</artifactId>
+				<artifactId>embedmongo-online-maven-plugin</artifactId>
 				<version>0.5.0</version>
 				<executions>
 					<execution>
